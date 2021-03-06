@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.style.setProperty(`--${e.target.name}`, e.target.value + suffix);
         e.target.nextElementSibling.value = e.target.value;
 
+        img.setAttribute('crossOrigin', 'anonymous');
         ctx.drawImage(img, 0, 0);
         ctx.filter = `${e.target.name === 'hue' ? e.target.name + '-rotate' : e.target.name}(${e.target.value}${suffix})`;
     }
@@ -44,11 +45,14 @@ document.addEventListener('DOMContentLoaded', () => {
             outputs.forEach(output => {
                 output.value = '0';
             });
+            ctx.drawImage(img, 0, 0);
+            ctx.filter = `${input.name === 'hue' ? input.name + '-rotate' : input.name}(${input.value}${input.dataset.sizing})`;
         });
     }
 
     let i = 0;
     let timeOfDay = '';
+
     function nextPicture(e) {
         addActiveClass(e);
 

@@ -180,8 +180,8 @@ img {
 }
 
 canvas {
-  /*display: none;*/
-  border:1px solid #000;
+  display: none;
+  border: 1px solid #000;
   max-height: 520px;
 }
 .fullscreen {
