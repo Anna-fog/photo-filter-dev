@@ -1,6 +1,7 @@
 'use strict'
 
 document.addEventListener('DOMContentLoaded', () => {
+    const images = ['01.jpg', '02.jpg', '03.jpg', '04.jpg', '05.jpg', '06.jpg', '07.jpg', '08.jpg', '09.jpg', '10.jpg', '11.jpg', '12.jpg', '13.jpg', '14.jpg', '15.jpg', '16.jpg', '17.jpg', '18.jpg', '19.jpg', '20.jpg'];
     const filters = document.querySelector('.filters');
     const inputs = document.querySelectorAll('input');
     const outputs = document.querySelectorAll('output');
@@ -12,11 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnFullScreen = document.querySelector('.openfullscreen');
     const img = document.querySelector('img');
     const canvas = document.querySelector('canvas');
-    const images = ['01.jpg', '02.jpg', '03.jpg', '04.jpg', '05.jpg', '06.jpg', '07.jpg', '08.jpg', '09.jpg', '10.jpg', '11.jpg', '12.jpg', '13.jpg', '14.jpg', '15.jpg', '16.jpg', '17.jpg', '18.jpg', '19.jpg', '20.jpg'];
     let currentPicture = "assets/img/img.jpg";
-
     const ctx = canvas.getContext("2d");
-
+    let currentFilters = '';
+    let mapOfFilters = new Map();
 
     function handleUpdate(e) {
         const suffix = e.target.dataset.sizing;
@@ -25,20 +25,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         img.setAttribute('crossOrigin', 'anonymous');
         ctx.drawImage(img, 0, 0);
-        ctx.filter = `${e.target.name === 'hue' ? e.target.name + '-rotate' : e.target.name}(${e.target.value}${suffix})`;
+        mapOfFilters.set(e.target.name === 'hue' ? e.target.name + '-rotate' : e.target.name, e.target.value + suffix);
+        let filtersStr = '';
+        mapOfFilters.forEach((value, key) => {
+            filtersStr += `${key}(${value}) `
+        });
+        ctx.filter = filtersStr;
+        currentFilters = filtersStr;
     }
 
     function addActiveClass(e) {
         buttons.forEach(btn => {
             btn.classList.remove('btn-active');
         });
-        if (e.target.classList.contains('btn')) {
-            e.target.classList.add('btn-active');
-        }
+        const classes = e.target.classList;
+        classes.contains('btn') ? classes.add('btn-active') : document.querySelector('.btn-load').classList.add('btn-active');
     }
 
     function resetFilters(e) {
         addActiveClass(e);
+        mapOfFilters = new Map();
         inputs.forEach(input => {
             input.value = input.defaultValue;
             document.documentElement.style.setProperty(`--${input.name}`,`${input.value}` + input.dataset.sizing);
@@ -78,6 +84,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const newImg = new Image();
             newImg.src = reader.result;
             img.src = newImg.src;
+            currentPicture = img.src;
+            drawImage();
         }
         reader.readAsDataURL(file);
     }
@@ -98,6 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         img.onload = function() {
             canvas.width = img.width;
             canvas.height = img.height;
+            ctx.filter = currentFilters;
             ctx.drawImage(img, 0, 0);
         };
     }
@@ -106,13 +115,9 @@ document.addEventListener('DOMContentLoaded', () => {
         !document.fullscreenElement ? document.documentElement.requestFullscreen() : document.exitFullscreen();
     }
 
-    filters.addEventListener('input', (e) => {
-        if (e.target.type === 'range') handleUpdate(e);
-    });
-    btnLoad.addEventListener('click', (e) => {
-        addActiveClass(e);
-        document.querySelector('.btn-load').classList.add('btn-active');
-    });
+    btnLoad.addEventListener('click', addActiveClass);
+    filters.addEventListener('input', handleUpdate);
+    filters.addEventListener('click', handleUpdate);
     btnReset.addEventListener('click', resetFilters);
     btnNext.addEventListener('click', nextPicture);
     btnLoad.addEventListener('change', loadPicture);

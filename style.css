@@ -180,10 +180,13 @@ img {
 }
 
 canvas {
-  display: none;
+  position: absolute;
+  top: 0;
+  visibility: hidden;
   border: 1px solid #000;
   max-height: 520px;
 }
+
 .fullscreen {
   position: fixed;
   top: 120px;
