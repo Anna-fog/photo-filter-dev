@@ -15,10 +15,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const images = ['01.jpg', '02.jpg', '03.jpg', '04.jpg', '05.jpg', '06.jpg', '07.jpg', '08.jpg', '09.jpg', '10.jpg', '11.jpg', '12.jpg', '13.jpg', '14.jpg', '15.jpg', '16.jpg', '17.jpg', '18.jpg', '19.jpg', '20.jpg'];
     let currentPicture = "assets/img/img.jpg";
 
+    const ctx = canvas.getContext("2d");
+
+
     function handleUpdate(e) {
         const suffix = e.target.dataset.sizing;
         document.documentElement.style.setProperty(`--${e.target.name}`, e.target.value + suffix);
         e.target.nextElementSibling.value = e.target.value;
+
+        ctx.drawImage(img, 0, 0);
+        ctx.filter = `${e.target.name === 'hue' ? e.target.name + '-rotate' : e.target.name}(${e.target.value}${suffix})`;
     }
 
     function addActiveClass(e) {
@@ -88,12 +94,9 @@ document.addEventListener('DOMContentLoaded', () => {
         img.onload = function() {
             canvas.width = img.width;
             canvas.height = img.height;
-            const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0);
         };
     }
-    // const dataURL = canvas.toDataURL("image/jpeg");
-
 
     function toggleFullScreen() {
         !document.fullscreenElement ? document.documentElement.requestFullscreen() : document.exitFullscreen();
