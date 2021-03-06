@@ -8,9 +8,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnReset = document.querySelector('.btn-reset');
     const btnNext = document.querySelector('.btn-next');
     const btnLoad = document.querySelector('.btn-load--input');
-    const img = document.querySelector('img');
+    const btnSave = document.querySelector('.btn-save');
     const btnFullScreen = document.querySelector('.openfullscreen');
+    const img = document.querySelector('img');
+    const canvas = document.querySelector('canvas');
     const images = ['01.jpg', '02.jpg', '03.jpg', '04.jpg', '05.jpg', '06.jpg', '07.jpg', '08.jpg', '09.jpg', '10.jpg', '11.jpg', '12.jpg', '13.jpg', '14.jpg', '15.jpg', '16.jpg', '17.jpg', '18.jpg', '19.jpg', '20.jpg'];
+    let currentPicture = "assets/img/img.jpg";
 
     function handleUpdate(e) {
         const suffix = e.target.dataset.sizing;
@@ -42,14 +45,20 @@ document.addEventListener('DOMContentLoaded', () => {
     let timeOfDay = '';
     function nextPicture(e) {
         addActiveClass(e);
-        const index = i % images.length;
-        i++
+
         const hour = new Date().getHours();
         if (hour >= 6 && hour < 12) timeOfDay = 'morning';
         else if (hour >= 12 && hour < 18) timeOfDay = 'day';
         else if (hour >= 18 && hour < 24) timeOfDay = 'evening';
-        else  timeOfDay = 'night';
-        img.src = `assets/img/${timeOfDay}/${images[index]}`;
+        else timeOfDay = 'night';
+
+        const base = `https://raw.githubusercontent.com/rolling-scopes-school/stage1-tasks/assets/images/${timeOfDay}/`;
+        const index = i % images.length;
+        const imgSrc = base + images[index];
+        currentPicture = imgSrc;
+        drawImage();
+        img.src = imgSrc;
+        i++
     }
 
     function loadPicture() {
@@ -62,6 +71,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         reader.readAsDataURL(file);
     }
+
+    function savePicture(e) {
+        addActiveClass(e);
+        let link = document.createElement('a');
+        link.download = 'download.jpg';
+        link.href = canvas.toDataURL();
+        link.click();
+        link.delete;
+    }
+
+    function drawImage() {
+        const img = new Image();
+        img.setAttribute('crossOrigin', 'anonymous');
+        img.src = currentPicture;
+        img.onload = function() {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0);
+        };
+    }
+    // const dataURL = canvas.toDataURL("image/jpeg");
+
 
     function toggleFullScreen() {
         !document.fullscreenElement ? document.documentElement.requestFullscreen() : document.exitFullscreen();
@@ -77,5 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnReset.addEventListener('click', resetFilters);
     btnNext.addEventListener('click', nextPicture);
     btnLoad.addEventListener('change', loadPicture);
+    btnSave.addEventListener('click', savePicture);
     btnFullScreen.addEventListener('click', toggleFullScreen);
+    drawImage();
 });
